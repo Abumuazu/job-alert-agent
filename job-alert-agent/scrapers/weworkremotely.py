@@ -10,7 +10,11 @@ from dateutil import parser as date_parser
 from config import KEYWORDS, LOOKBACK_MINUTES
 
 RSS_URL  = "https://weworkremotely.com/remote-jobs/search.atom"
-HEADERS  = {"User-Agent": "Mozilla/5.0 (compatible; JobAlertBot/1.0)"}
+HEADERS  = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept":     "application/atom+xml,application/xml,text/xml,text/html;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
 NS       = {"atom": "http://www.w3.org/2005/Atom"}
 
 
