@@ -50,8 +50,7 @@ jobs:
 
       - name: Run scraper
         env:
-          GMAIL_SENDER:       ${{ secrets.GMAIL_SENDER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python main.py
 
       - name: Commit updated seen_jobs.json
