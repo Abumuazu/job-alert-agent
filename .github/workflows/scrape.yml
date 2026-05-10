@@ -1,0 +1,66 @@
+name: Job Scraper — Every 15 Minutes
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    # ubuntu-22.04 is required — ubuntu-latest is now 24.04 which renamed
+    # libasound2 → libasound2t64, breaking Playwright's Chromium install.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: job-alert-agent
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('job-alert-agent/requirements.txt') }}
+          restore-keys: pip-
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache Playwright browser
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-ubuntu22-v2
+
+      - name: Install Playwright + Chromium (full install on cache miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: playwright install chromium --with-deps
+
+      - name: Install Chromium system deps (cache hit — browser binary already cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: playwright install-deps chromium
+
+      - name: Run scraper
+        env:
+          GMAIL_SENDER:       ${{ secrets.GMAIL_SENDER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python main.py
+
+      - name: Commit updated seen_jobs.json
+        run: |
+          git config user.name  "Job Alert Bot"
+          git config user.email "bot@jobalert.local"
+          git add seen_jobs.json
+          git diff --staged --quiet || git commit -m "chore: update seen jobs [skip ci]"
+          git push
