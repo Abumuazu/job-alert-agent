@@ -22,7 +22,7 @@ KEYWORDS = [
 # ── Filters ───────────────────────────────────────────────────────────────────
 SALARY_MIN = 45000          # USD annual — jobs below this get a lower score
 SCORE_THRESHOLD = 40        # Minimum match score (0-100) to include in alert
-LOOKBACK_MINUTES = 240      # 4 hours — wide net; dedup prevents re-alerting on seen jobs
+LOOKBACK_MINUTES = 10080       # 4 hours — wide net; dedup prevents re-alerting on seen jobs
 
 # ── Phrases that disqualify a job (case-insensitive) ─────────────────────────
 EXCLUSION_PHRASES = [
