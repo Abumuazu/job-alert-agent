@@ -2,16 +2,13 @@ name: Daily Digest — 7am UTC
 
 on:
   schedule:
-    - cron: '0 7 * * *'
-  workflow_dispatch:
+    - cron: '0 7 * * *'    # 7:00am UTC every day
+  workflow_dispatch:        # trigger manually from GitHub UI
 
 jobs:
   digest:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
-    defaults:
-      run:
-        working-directory: job-alert-agent
 
     steps:
       - name: Checkout repo
@@ -26,7 +23,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: pip-${{ hashFiles('job-alert-agent/requirements.txt') }}
+          key: pip-${{ hashFiles('requirements.txt') }}
           restore-keys: pip-
 
       - name: Install dependencies
@@ -34,6 +31,5 @@ jobs:
 
       - name: Send daily digest
         env:
-          GMAIL_SENDER:       ${{ secrets.GMAIL_SENDER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python daily_digest.py
